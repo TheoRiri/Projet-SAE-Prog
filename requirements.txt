@@ -1,3 +1,1 @@
-Version python utilisé : 3.9.2
-
-Modules :  Datetime
+pytz == 2023.3.post1
