@@ -1,0 +1,26 @@
+import argparse
+from module2 import traiter_donnees, generer_html, lire_fichier_ics, ecrire_fichier_html
+
+def main():
+    parser = argparse.ArgumentParser(description="Générateur d'emploi du temps à partir de fichiers .ics")
+    parser.add_argument("--fichier-entree", nargs='+', required=True, help="Fichiers iCalendar (par exemple, file1.ics file2.ics)")
+    parser.add_argument("--fichier-sortie", required=True, help="Chemin du fichier HTML de sortie")
+
+    args = parser.parse_args()
+
+    toutes_les_donnees = []
+    for chemin_fichier in args.fichier_entree:
+        contenu_ics = lire_fichier_ics(chemin_fichier)
+        toutes_les_donnees.append(contenu_ics)
+
+    evenements = []
+    for donnees in toutes_les_donnees:
+        evenements.extend(traiter_donnees(donnees))
+
+    contenu_html = generer_html(evenements)
+    ecrire_fichier_html(contenu_html, args.fichier_sortie)
+
+    print("Page HTML générée avec succès.")
+
+if __name__ == "__main__":
+    main()
