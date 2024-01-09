@@ -18,6 +18,24 @@ def extract_data(file_list: List[str]) -> List[str]:
             data.append(file.read())
     return data
 
+def calculate_duration(start_time: str, end_time: str) -> str:
+    """
+    Calcule la durée entre deux horaires.
+
+    Paramètres :
+    - start_time (str): Horaire de début au format '%H:%M'.
+    - end_time (str): Horaire de fin au format '%H:%M'.
+
+    Retourne :
+    - str: Durée formatée.
+    """
+    start = datetime.strptime(start_time, '%H:%M')
+    end = datetime.strptime(end_time, '%H:%M')
+    duration = end - start
+    hours, remainder = divmod(duration.seconds, 3600)
+    minutes = remainder // 60
+    return f"{hours}h{minutes:02d}"
+
 def process_data(data: List[str], allowed_teachers: Optional[List[str]] = None) -> List[Dict[str, str]]:
     """
     Traite les données du calendrier pour extraire les informations pertinentes.
@@ -70,6 +88,7 @@ def process_data(data: List[str], allowed_teachers: Optional[List[str]] = None) 
                 summary = event.get('summary', '')
                 start_time = event.get('start_time', '')
                 end_time = event.get('end_time', '')
+                event['duration'] = calculate_duration(start_time, end_time)
                 processed_data.append(event)
 
     processed_data.sort(key=lambda x: datetime.strptime(x['date'], '%d-%m-%Y'))
@@ -121,6 +140,7 @@ def generate_html(data: List[Dict[str, str]], output_file: str) -> None:
                 <th>Date</th>
                 <th>Horaire de début</th>
                 <th>Horaire de fin</th>
+                <th>Durée</th>
                 <th>Nom du cours</th>
                 <th>Salle</th>
                 <th>Groupe</th>
@@ -134,6 +154,7 @@ def generate_html(data: List[Dict[str, str]], output_file: str) -> None:
                 <td>{event['date']}</td>
                 <td>{event['start_time']}</td>
                 <td>{event['end_time']}</td>
+                <td>{event['duration']}</td>
                 <td>{event.get('summary', '')}</td>
                 <td>{event.get('location', '')}</td>
                 <td>{event.get('group', '')}</td>
